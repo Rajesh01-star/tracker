@@ -1,0 +1,2 @@
+- auth page will direct "sign up" & "log in" components 
+- 

@@ -1,12 +1,11 @@
-import Navbar from "./Components/Navbar";
-import Auth from "./Pages/Auth";
+import Navbar from "../components/Navbar";
+import AuthNew from "./Pages/AuthNew";
 
 export default function Home() {
   return (
     <section>
       <Navbar />
-      {/* <SignUp /> */}
-      <Auth authName="login" />
+      <AuthNew />
     </section>
   );
 }

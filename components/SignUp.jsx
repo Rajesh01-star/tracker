@@ -13,7 +13,6 @@ function SignUp({ changeToLogin }) {
   const [alertVisible, setAlertVisible] = useState(false); // Alert visibility state
   const [alertMessage, setAlertMessage] = useState(""); // Alert message state
 
-  console.log(process.env.NEXT_PUBLIC_Firebasekey)
   async function btnClickHandler(e) {
     e.preventDefault();
 
@@ -39,8 +38,9 @@ function SignUp({ changeToLogin }) {
         }
       );
 
+      const result = await response.json();
       if (response.ok) {
-        router.push("/Welcome");
+        router.push(`/Welcome?idToken=${encodeURIComponent(result.idToken)}`);
       } else {
         const data = await response.json();
         setAlertMessage(`Error: ${data.error.message}`);

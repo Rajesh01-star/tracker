@@ -5,7 +5,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Terminal } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-function SignUp({ changeToLogin }) {
+function SignUp({ changePage }) {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -151,7 +151,7 @@ function SignUp({ changeToLogin }) {
           <div className="mt-4 text-center">
             <button
               className="text-indigo-600 hover:underline"
-              onClick={() => changeToLogin("login")}
+              onClick={() => changePage("login")}
             >
               Have an account? Login
             </button>

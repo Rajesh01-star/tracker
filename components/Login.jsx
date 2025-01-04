@@ -2,10 +2,10 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Terminal } from 'lucide-react';
+import { Terminal } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-function Login({ changeToSignUp }) {
+function Login({ changePage }) {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -34,7 +34,7 @@ function Login({ changeToSignUp }) {
       const result = await response.json();
       if (response.ok) {
         localStorage.setItem("idToken", result.idToken);
-      
+
         router.push("/Welcome");
       } else {
         setAlertMessage(`Error: ${result.error.message}`);
@@ -111,7 +111,9 @@ function Login({ changeToSignUp }) {
                 }}
               />
             </div>
-
+            <button onClick={()=> changePage("forgotPassword")} className="text-indigo-600 w-full mb-2 hover:underline">
+              Forgot Password ?
+            </button>
             <button
               type="submit"
               className="w-full bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-none"
@@ -123,7 +125,7 @@ function Login({ changeToSignUp }) {
           <div className="mt-4 text-center">
             <button
               className="text-indigo-600 hover:underline"
-              onClick={() => changeToSignUp("signup")}
+              onClick={() => changePage("signup")}
             >
               Don't have an account? Sign up
             </button>
@@ -135,4 +137,3 @@ function Login({ changeToSignUp }) {
 }
 
 export default Login;
-

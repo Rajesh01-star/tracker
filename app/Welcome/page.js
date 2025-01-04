@@ -1,19 +1,24 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { GithubIcon, WholeWordIcon } from "lucide-react";
-import React, { useState } from "react";
+import { Label } from "@radix-ui/react-label";
+import { useEffect, useState } from "react";
 
 function Welcom() {
   const [completeTabOpen, setCompleteTabOpen] = useState(false);
   const [name, setName] = useState("");
   const [iconURL, setIconURL] = useState("");
+  const [profileCompleted, setProfileCompleted] = useState(false);
+  const [token, setToken] = useState("");
+
+  // Retrieve token when the component mounts
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const idToken = params.get("idToken");
+    setToken(idToken);
+  }, []);
 
   async function handleUpdateClick() {
-    const params = new URLSearchParams(window.location.search);
-    const token = params.get("idToken");
-
     try {
       const response = await fetch(
         `https://identitytoolkit.googleapis.com/v1/accounts:update?key=${process.env.NEXT_PUBLIC_Firebasekey}`,
@@ -31,30 +36,61 @@ function Welcom() {
         }
       );
       if (response.ok) {
-        alert("profile updated!!!");
+        setProfileCompleted(true);
+        setCompleteTabOpen(false);
       } else {
         const data = await response.json();
-        setAlertMessage(`Error: ${data.error.message}`);
-        setAlertVisible(true);
+        console.error(`Error: ${data.error.message}`);
       }
     } catch (err) {
       console.log(err);
     }
   }
 
+  async function getUserData() {
+    try {
+      const response = await fetch(
+        `https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${process.env.NEXT_PUBLIC_Firebasekey}`,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            idToken: token,
+          }),
+          headers: {
+            "Content-type": "application/json",
+          },
+        }
+      );
+      const result = await response.json();
+      console.log(result);
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  useEffect(() => {
+    if (token) {
+      getUserData();
+    }
+  }, [profileCompleted, token]);
+
+  const message = profileCompleted
+    ? "Your profile is complete."
+    : completeTabOpen
+    ? "Your Profile is 64% complete. A complete profile has higher chances of getting a job:"
+    : "Your profile is incomplete:";
+
   return (
     <section className="flex flex-col mx-10">
       <div className="flex justify-around p-4">
         <div>Welcom to the Expense Tracker</div>
-        <div className=" w-96">
-          {completeTabOpen
-            ? "Your Profile is 64% complete. A complete profile has higher chances of getting a job:"
-            : "Your profile is incomplete:"}
+        <div className="w-96">
+          {message}
           <span
             onClick={() => setCompleteTabOpen((prevState) => !prevState)}
             className="text-blue-800 cursor-pointer"
           >
-            {"  "}Complete Now
+            {!profileCompleted && "Complete Now"}
           </span>
         </div>
       </div>
@@ -66,14 +102,13 @@ function Welcom() {
               onClick={() => setCompleteTabOpen((prevState) => !prevState)}
               variant="destructive"
             >
-              cancel
+              Cancel
             </Button>
           </div>
           <section className="flex gap-10 m-2">
             <div className="flex gap-2 justify-center items-center basis-1/2">
-              <GithubIcon />
-              <Label className=" text-lg" htmlFor="name">
-                FullName
+              <Label className="text-lg" htmlFor="name">
+                Full Name
               </Label>
               <Input
                 id="name"
@@ -83,7 +118,6 @@ function Welcom() {
               />
             </div>
             <div className="flex gap-2 justify-center items-center basis-1/2">
-              <WholeWordIcon />
               <Label className="text-lg whitespace-nowrap" htmlFor="url">
                 Picture URL
               </Label>

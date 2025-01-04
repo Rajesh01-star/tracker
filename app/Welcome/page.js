@@ -68,6 +68,28 @@ function Welcom() {
     }
   }
 
+  async function handleVerifyClick() {
+    try {
+      const response = await fetch(
+        `https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=${process.env.NEXT_PUBLIC_Firebasekey}`,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            requestType: "VERIFY_EMAIL",
+            idToken: token,
+          }),
+          headers: {
+            "Content-type": "application/json",
+          },
+        }
+      );
+      const result = await response.json();
+      console.log(result);
+    } catch (err) {
+      alert(result.err.message);
+    }
+  }
+
   useEffect(() => {
     if (token) {
       getUserData();
@@ -94,6 +116,11 @@ function Welcom() {
           </span>
         </div>
       </div>
+      {profileCompleted && (
+        <div>
+          <Button onClick={handleVerifyClick}>Verfiy Email</Button>
+        </div>
+      )}
       {completeTabOpen && (
         <div className="w-[50%] border-b-[1px] border-black p-4 self-end">
           <div className="flex justify-between">

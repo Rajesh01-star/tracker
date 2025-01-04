@@ -33,8 +33,9 @@ function Login({ changeToSignUp }) {
       );
       const result = await response.json();
       if (response.ok) {
-        router.push(`/Welcome?idToken=${encodeURIComponent(result.idToken)}`);
-
+        localStorage.setItem("idToken", result.idToken);
+      
+        router.push("/Welcome");
       } else {
         setAlertMessage(`Error: ${result.error.message}`);
         setAlertVisible(true);

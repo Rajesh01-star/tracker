@@ -11,11 +11,13 @@ function Welcom() {
   const [profileCompleted, setProfileCompleted] = useState(false);
   const [token, setToken] = useState("");
 
-  // Retrieve token when the component mounts
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const idToken = params.get("idToken");
-    setToken(idToken);
+    const storedToken = localStorage.getItem("idToken");
+    if (storedToken) {
+      setToken(storedToken);
+    } else {
+      console.warn("No token found in localStorage.");
+    }
   }, []);
 
   async function handleUpdateClick() {
@@ -90,6 +92,10 @@ function Welcom() {
     }
   }
 
+  function handleLogoutBtn() {
+    localStorage.removeItem("idToken");
+  }
+
   useEffect(() => {
     if (token) {
       getUserData();
@@ -117,9 +123,14 @@ function Welcom() {
         </div>
       </div>
       {profileCompleted && (
-        <div>
-          <Button onClick={handleVerifyClick}>Verfiy Email</Button>
-        </div>
+        <section className="flex justify-between">
+          <>
+            <Button onClick={handleVerifyClick}>Verfiy Email</Button>
+          </>
+          <>
+            <Button onClick={handleLogoutBtn}>Log out</Button>
+          </>
+        </section>
       )}
       {completeTabOpen && (
         <div className="w-[50%] border-b-[1px] border-black p-4 self-end">

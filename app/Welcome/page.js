@@ -1,8 +1,10 @@
 "use client";
+import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@radix-ui/react-label";
-import { useEffect, useState } from "react";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 function Welcom() {
   const [completeTabOpen, setCompleteTabOpen] = useState(false);
@@ -10,6 +12,10 @@ function Welcom() {
   const [iconURL, setIconURL] = useState("");
   const [profileCompleted, setProfileCompleted] = useState(false);
   const [token, setToken] = useState("");
+  const [expenses, setExpenses] = useState([]);
+  const [amount, setAmount] = useState('');
+  const [description, setDescription] = useState('');
+  const [category, setCategory] = useState('');
 
   useEffect(() => {
     const storedToken = localStorage.getItem("idToken");
@@ -88,12 +94,13 @@ function Welcom() {
       const result = await response.json();
       console.log(result);
     } catch (err) {
-      alert(result.err.message);
+      alert(err.message);
     }
   }
 
   function handleLogoutBtn() {
     localStorage.removeItem("idToken");
+    setToken("");
   }
 
   useEffect(() => {
@@ -108,10 +115,27 @@ function Welcom() {
     ? "Your Profile is 64% complete. A complete profile has higher chances of getting a job:"
     : "Your profile is incomplete:";
 
+  const handleSubmitExpense = (e) => {
+    e.preventDefault();
+    if (!amount || !description || !category) return;
+
+    const newExpense = {
+      id: Date.now(),
+      amount: parseFloat(amount),
+      description,
+      category
+    };
+
+    setExpenses([newExpense, ...expenses]);
+    setAmount('');
+    setDescription('');
+    setCategory('');
+  };
+
   return (
     <section className="flex flex-col mx-10">
       <div className="flex justify-around p-4">
-        <div>Welcom to the Expense Tracker</div>
+        <div>Welcome to the Expense Tracker</div>
         <div className="w-96">
           {message}
           <span
@@ -125,7 +149,7 @@ function Welcom() {
       {profileCompleted && (
         <section className="flex justify-between">
           <>
-            <Button onClick={handleVerifyClick}>Verfiy Email</Button>
+            <Button onClick={handleVerifyClick}>Verify Email</Button>
           </>
           <>
             <Button onClick={handleLogoutBtn}>Log out</Button>
@@ -172,8 +196,74 @@ function Welcom() {
           </Button>
         </div>
       )}
+      {token && (
+        <div className="mt-8 w-[30%] m-auto">
+          <Card className="">
+            <CardHeader>
+              <CardTitle>Add Daily Expense</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleSubmitExpense} className="space-y-4">
+                <div>
+                  <Label htmlFor="amount">Amount Spent</Label>
+                  <Input
+                    id="amount"
+                    type="number"
+                    placeholder="Amount Spent"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="description">Description</Label>
+                  <Input
+                    id="description"
+                    type="text"
+                    placeholder="Description"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="category">Category</Label>
+                  <Select value={category} onValueChange={setCategory} required>
+                    <SelectTrigger id="category">
+                      <SelectValue placeholder="Select Category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Food">Food</SelectItem>
+                      <SelectItem value="Petrol">Petrol</SelectItem>
+                      <SelectItem value="Salary">Salary</SelectItem>
+                      <SelectItem value="Other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <Button type="submit" className="w-full">Add Expense</Button>
+              </form>
+            </CardContent>
+          </Card>
+
+          <div className="mt-8">
+            <h2 className="text-2xl font-bold mb-4">Expense List</h2>
+            {expenses.map((expense) => (
+              <Card key={expense.id} className="mb-4">
+                <CardContent className="flex justify-between items-center p-4">
+                  <div>
+                    <p className="font-semibold">{expense.description}</p>
+                    <p className="text-sm text-gray-500">{expense.category}</p>
+                  </div>
+                  <p className="text-lg font-bold">${expense.amount.toFixed(2)}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
     </section>
   );
 }
 
 export default Welcom;
+
